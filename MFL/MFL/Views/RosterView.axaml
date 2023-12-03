@@ -16,6 +16,7 @@
 		<TextBlock
 			HorizontalAlignment="Center"
 			VerticalAlignment="Center"
+			FontWeight="Bold"
 			Text="{Binding FranchiseID}" />
 	</Grid>
 </UserControl>
