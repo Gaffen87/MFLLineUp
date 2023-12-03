@@ -8,6 +8,7 @@
 	d:DesignHeight="600"
 	d:DesignWidth="400"
 	x:DataType="vm:RosterViewModel"
+	Background="AliceBlue"
 	mc:Ignorable="d">
 	<Design.DataContext>
 		<vm:RosterViewModel />
