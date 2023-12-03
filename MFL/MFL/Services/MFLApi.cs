@@ -31,10 +31,10 @@ public class MFLApi
 		var response = await _httpClient.PostAsync(uri, content);
 
 		var cookies = _cookieContainer.GetCookies(uri);
-		Uri domain = await GetDomain();
 
 		if (cookies.Count > 0) 
 		{
+			Uri domain = await GetDomain();
 			result = true;
 			foreach ( Cookie cookie in cookies )
 			{
@@ -47,8 +47,7 @@ public class MFLApi
 
 	private async Task<Uri> GetDomain()
 	{
-		var response = await _httpClient.GetStringAsync("https://api.myfantasyleague.com/2023/export?TYPE=myleagues&YEAR=&FRANCHISE_NAMES=&JSON=1");
-		JObject myLeagues = JObject.Parse(response);
+		JObject myLeagues = JObject.Parse(await _httpClient.GetStringAsync("https://api.myfantasyleague.com/2023/export?TYPE=myleagues&YEAR=&FRANCHISE_NAMES=&JSON=1"));
 		var result = myLeagues["leagues"]["league"]["url"].ToString();
 
 		return new Uri(result);
@@ -56,11 +55,18 @@ public class MFLApi
 
 	public async Task<string> GetFranchiseID()
 	{
-		JObject myLeagues = JObject.Parse(await _httpClient.GetStringAsync("https://api.myfantasyleague.com/2023/export?TYPE=myleagues&YEAR=2022&FRANCHISE_NAMES=&JSON=1"));
-		var result = myLeagues["leagues"]["league"].Children().ToList();
-		var league = result.Where(x => x["name"].ToString() == "Ikast Dynasty League").ToList();
-
-		return "";
+		JObject myLeagues = JObject.Parse(await _httpClient.GetStringAsync("https://api.myfantasyleague.com/2023/export?TYPE=myleagues&YEAR=&FRANCHISE_NAMES=&JSON=1"));
+		var result = myLeagues["leagues"]["league"].ToList();
+		try
+		{
+			var franchiseId = result.FirstOrDefault(x => x["name"].ToString() == "Ikast Dynasty League");
+			return franchiseId["franchise_id"].ToString();
+		}
+		catch (Exception)
+		{
+			return myLeagues["leagues"]["league"]["franchise_id"].ToString();
+		}
+		
 	}
 
 }

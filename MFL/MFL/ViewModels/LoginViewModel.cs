@@ -1,10 +1,16 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.SimpleRouter;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using HanumanInstitute.MvvmDialogs;
 using MFL.Services;
 using MsBox.Avalonia;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -14,11 +20,16 @@ namespace MFL.ViewModels;
 
 public partial class LoginViewModel : ViewModelBase
 {
+	private ViewLocator _viewLocator;
 	private readonly MFLApi mfl;
-    public LoginViewModel()
+	private readonly HistoryRouter<ViewModelBase> router;
+
+	public LoginViewModel(HistoryRouter<ViewModelBase> router)
     {
         mfl = new MFLApi();
-    }
+		_viewLocator = new ViewLocator();
+		this.router = router;
+	}
 
     public string Greeting => "Welcome to Login!";
 
@@ -36,6 +47,8 @@ public partial class LoginViewModel : ViewModelBase
 		if (await mfl.ValidateUser(Email!, Password!))
 		{
 			string franchiseID = await mfl.GetFranchiseID();
+			var rosterVM = router.GoTo<RosterViewModel>();
+			rosterVM.FranchiseID = franchiseID;
 		}
 		else
 		{
